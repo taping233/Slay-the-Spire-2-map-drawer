@@ -1,0 +1,130 @@
+# STS2 Map Drawer
+
+把图片转换成鼠标拖拽笔触，用于在《杀戮尖塔 2》的地图绘制界面里慢速描图。
+
+本项目不会读取游戏内存、修改游戏文件或自动战斗，只会在你框选的屏幕区域内移动鼠标，适合单机娱乐涂鸦。
+
+> 目前只面向 Windows。图形界面和热键依赖 Windows 鼠标、窗口和按键 API。
+
+## 功能
+
+- 支持线条描绘、手绘素描、横向填充三种绘制风格。
+- 全屏透明悬浮前端，可直接覆盖在游戏上校准区域。
+- 在游戏绘制区域内显示橙色笔触预览。
+- 后台待命后可用热键开始绘制。
+- 绘制时完整前端会收起为右上角小提示，提示 `F5` 可暂停。
+- 绘制中按 `F5` 暂停/继续，暂停时会自动唤醒完整前端。
+- 绘制完成、停止或失败后会自动回到完整前端，并关闭本次预览线。
+- 同一桌面会话最多只允许一个工具前端/后台实例运行。
+- CLI 可生成预览图或导出 JSON 笔触计划，便于调试。
+
+## 安装
+
+```powershell
+python -m venv .venv
+.\.venv\Scripts\Activate.ps1
+pip install -r requirements.txt
+```
+
+## 图形界面
+
+从源码启动：
+
+```powershell
+.\run.cmd gui
+```
+
+如果已经构建或下载了 Release 版本，也可以双击运行：
+
+```text
+STS2MapDrawer.exe
+```
+
+构建双击启动器：
+
+```powershell
+.\build_launcher.cmd
+```
+
+基本流程：
+
+1. 打开游戏并切到地图绘制界面，建议使用窗口化或无边框窗口。
+2. 点击 `调整区域`，在游戏的可绘制区域上拖出矩形。
+3. 点击 `选择图片`。
+4. 调整绘制风格、阈值、采样间距、线条上限和速度参数，直到橙色预览合适。
+5. 点击 `退回后台(F4)` 或按 `F4`。
+6. 回到游戏里点开画笔，再按 `F1` 开始绘制。
+7. 绘制时会保留右上角小提示；按 `F5` 暂停后可在完整前端里调整或停止。
+
+需要把框选区域全部涂黑时，先框选区域并点开游戏里的画笔，然后点击 `战争迷雾`。
+
+## 热键
+
+- `F1`：开始绘制。后台待命时会直接开始；前台时会走倒计时。
+- `F3`：重新显示工具前端。
+- `F4`：隐藏到后台待命。
+- `F5`：绘制中短按暂停/继续；暂停时完整前端会自动显示。
+- 长按 `F5`、`Esc` 或 `F9`：停止绘制。
+- `Ctrl+C`：从终端停止。
+
+## 参数说明
+
+- `绘制风格`：`线条描绘` 适合轮廓和主要结构；`手绘素描` 更像手画曲线；`横向填充` 会填满暗部区域。
+- `阈值`：越高绘制内容越多，越低越简洁。
+- `采样间距`：越小细节越多，但耗时更长。
+- `最短线段`：过滤过短噪点。
+- `线条上限`：限制线条描绘和手绘素描的最大笔触数。
+- `反相`：绘制亮部而不是暗部。
+- `绘制秒数`：每条笔触拖拽用时。
+- `定位秒数`：移动到下一笔起点的用时。
+- `停顿秒数`：每条笔触之间的额外停顿。
+
+## CLI
+
+生成预览：
+
+```powershell
+.\run.cmd preview path\to\image.png --output preview.png --canvas 640x360 --step 4 --threshold 170
+```
+
+导出笔触计划：
+
+```powershell
+.\run.cmd plan path\to\image.png --output stroke_plan.json
+```
+
+命令行绘制：
+
+```powershell
+.\run.cmd draw path\to\image.png --config config.json --preview preview.png --countdown 5
+```
+
+常用 CLI 参数：
+
+- `--canvas 640x360`：虚拟绘制画布，建议匹配已框选区域的宽高比。
+- `--threshold 170`：亮度阈值。
+- `--step 4`：采样间距。
+- `--min-run 3`：最短线段。
+- `--mode lines`：可选 `lines`、`handdrawn`、`scanline`。
+- `--line-count 500`：线条数量上限。
+- `--invert`：反相绘制。
+- `--move-duration 0.01`：每条线的拖拽时间。
+- `--jump-duration 0.0`：移动到下一笔起点的时间。
+- `--stroke-pause 0.0`：笔触间停顿。
+
+## 仓库内容
+
+建议上传源码和脚本：
+
+- `sts2_drawer/`：核心 Python 包。
+- `launcher/`、`build_launcher.cmd`：Windows 双击启动器源码和构建脚本。
+- `run.cmd`、`run.ps1`：本地启动脚本。
+- `pyproject.toml`、`requirements.txt`：打包和依赖声明。
+- `config.example.json`：绘制区域配置示例。
+
+不要提交本地运行产物或个人素材：
+
+- `.venv/`、`__pycache__/`。
+- `config.json`。
+- `preview*.png`、`stroke_plan*.json`。
+- 本地截图、测试照片和生成的 `STS2MapDrawer.exe`。如需分发 exe，建议放到 GitHub Release。
