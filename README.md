@@ -112,19 +112,4 @@ STS2MapDrawer.exe
 - `--jump-duration 0.0`：移动到下一笔起点的时间。
 - `--stroke-pause 0.0`：笔触间停顿。
 
-## 仓库内容
 
-建议上传源码和脚本：
-
-- `sts2_drawer/`：核心 Python 包。
-- `launcher/`、`build_launcher.cmd`：Windows 双击启动器源码和构建脚本。
-- `run.cmd`、`run.ps1`：本地启动脚本。
-- `pyproject.toml`、`requirements.txt`：打包和依赖声明。
-- `config.example.json`：绘制区域配置示例。
-
-不要提交本地运行产物或个人素材：
-
-- `.venv/`、`__pycache__/`。
-- `config.json`。
-- `preview*.png`、`stroke_plan*.json`。
-- 本地截图、测试照片和生成的 `STS2MapDrawer.exe`。如需分发 exe，建议放到 GitHub Release。
